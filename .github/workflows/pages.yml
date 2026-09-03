@@ -7,6 +7,10 @@ on:
 
   workflow_dispatch:
 
+env:
+  CARGO_TERM_COLOR: always
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
   pages: write
@@ -30,14 +34,19 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Trunk
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Setup Rust
         run: |
-          wget -qO- \
-            https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-gnu.tar.gz \
-            | tar -xzf-
+          rustup target add wasm32-unknown-unknown
+          cargo clippy
+          cargo fmt --check
 
-      - name: Build
+      - name: Download and install Trunk binary
+        run: wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+
+      - name: Build with Trunk
         run: ./trunk build --release --public-url "${GITHUB_REPOSITORY#*/}"
 
       - name: Configure GitHub Pages
