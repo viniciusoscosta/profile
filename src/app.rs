@@ -14,7 +14,7 @@ pub fn App() -> impl IntoView {
     view! {
         <Stylesheet id="leptos" href="/style/output.css"/>
         <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
-        <Router>
+        <Router base="/profile">
             <Routes fallback=|| "Page not found.">
                 <Route path=StaticSegment("") view=LandingPage/>
             </Routes>
